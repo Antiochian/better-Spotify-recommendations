@@ -109,6 +109,7 @@ def recc_CLI(spotify):
     REVERSE = Diving_Bell.reverse_reccs(spotify,target_ID,5)
     print("Search complete. Total time: ",time.time()-t0)
     print("-"*10)
+    print("\n RESULTS FOR SEARCH: ",search_term)
     #timing data
     print("\nSPOTIFY RECCS:")
     print_info(spotify, DEFAULT)
