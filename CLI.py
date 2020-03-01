@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*- python3
 """
 Created on Sun Mar  1 14:45:11 2020
-
+Crude user interface for the main Diving Bell file
 @author: Antiochian
 """
 from random import shuffle
@@ -9,37 +9,7 @@ import time
 import Diving_Bell
 from Diving_Bell import NUM_OF_RECCS
 
-def targeted_scraper(width=5,depth=2,targetseed=None):
-    """This scraper is much slower, and more wasteful on the API, but is
-    extremely targetted towards a specific artist, and never strays too far away from it.
-    Best used in small doses.
-    """
-    spotify=Diving_Bell.setup()
-    if targetseed==None:
-        targetseed=CL_search(spotify,input("Artist Search: "))
-    print("Running ",width,"x",depth," search...")
-    print("[Estimated runtime = ",round((NUM_OF_RECCS**depth)*width*0.025/60,3)," minutes]") #84 is experimentally determined
-    t0 = time.time()
-    Diving_Bell.breadthwise_launcher(targetseed,width,depth)
-    Diving_Bell.estimate_database_size()
-    print("\tCompleted in: ",round((time.time()-t0)/60,3)," min")
-    return
-
-def save_playlist(spotify,list_of_tracks,target_ID):
-    """Converts list of track IDs to a saved playlist"""
-    list_of_IDs = [track['id'] for track in list_of_tracks]
-    shuffle(list_of_IDs)
-    playlist_name = "Auto-Reccer's Auto-Playlist"
-    user_ID = spotify.me()['id']
-    playlist = spotify.user_playlist_create(user_ID, playlist_name, public=False, description=description())
-    playlist_ID = playlist['id']
-    spotify.user_playlist_add_tracks(user_ID, playlist_ID, list_of_IDs, position=None)
-    return
-
-def description():
-    coredesc = "Spotify Diving Bell v2 by Antioch"
-    dateinfo = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-    return coredesc+"\n"+dateinfo
+############## VISUAL DISPLAY ##################
 
 def print_header():
     print("""
@@ -172,6 +142,43 @@ def CL_search(spotify, search_term):
         return opt_dict[int(choice)] #ID value of choice
     else:
         return 0
-    
+
+############### MAKE PLAYLIST ##################
+
+def save_playlist(spotify,list_of_tracks,target_ID):
+    """Converts list of track IDs to a saved playlist"""
+    list_of_IDs = [track['id'] for track in list_of_tracks]
+    shuffle(list_of_IDs)
+    playlist_name = "Auto-Reccer's Auto-Playlist"
+    user_ID = spotify.me()['id']
+    playlist = spotify.user_playlist_create(user_ID, playlist_name, public=False, description=description())
+    playlist_ID = playlist['id']
+    spotify.user_playlist_add_tracks(user_ID, playlist_ID, list_of_IDs, position=None)
+    return
+
+def description():
+    coredesc = "Spotify Diving Bell v2 by Antioch"
+    dateinfo = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+    return coredesc+"\n"+dateinfo
+
+################### MISC ########################
+
+def targeted_scraper(width=5,depth=2,targetseed=None):
+    """This scraper is much slower, and more wasteful on the API, but is
+    extremely targetted towards a specific artist, and never strays too far away from it.
+    Best used in small doses.
+    """
+    spotify=Diving_Bell.setup()
+    if targetseed==None:
+        targetseed=CL_search(spotify,input("Artist Search: "))
+    print("Running ",width,"x",depth," search...")
+    print("[Estimated runtime = ",round((NUM_OF_RECCS**depth)*width*0.025/60,3)," minutes]") #84 is experimentally determined
+    t0 = time.time()
+    Diving_Bell.breadthwise_launcher(targetseed,width,depth)
+    Diving_Bell.estimate_database_size()
+    print("\tCompleted in: ",round((time.time()-t0)/60,3)," min")
+    return
+
 if __name__ == "__main__":
     menu_CLI(True)
+    
