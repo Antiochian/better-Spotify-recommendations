@@ -8,8 +8,8 @@ Eventually this is going to go on a web app, once I figure out how the heck Flas
 HOW IT WORKS:
 ------------
 Everyone knows that the spotify recommendation system is underwhelming. The two key problems I identified with it were:
-  1: It looks at your play history, and so only recommends music that is basically the same as what you already listen to
-  2: It mostly recommends mainstream, popular bands you have probably already heard of
+  - It looks at your play history, and so only recommends music that is basically the same as what you already listen to
+  - It mostly recommends mainstream, popular bands you have probably already heard of
 
 I wanted to make an algorithm to recommend new music to me that would pull me outside of a comfort zone a little, and provide more interesting reccs, using only the Spotify API. The first issue is easily solved by deliberately using a "dumb" algorithm that knows nothing about the user, to avoid inadvertently pigeonholing them and introduce more variety.
 
