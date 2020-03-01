@@ -23,15 +23,14 @@ This database will have a total size of 320MB when filled out with all 1.2 milli
 SAMPLE IMAGES:
 ---------
 
-|:--:| 
-|![Menu screen](splash.PNG) | 
 | *Splash Screen* |
+|![Menu screen](splash.PNG)|
 |:--:| 
-|![Search results](results.PNG)|
 | *Example results for the noise-rock band "Swans"*|
+|![Search results](results.PNG)|
 |:--:| 
-|![Resulting Playlist](playlist.PNG)|
 | *Example resulting playlist for Swans* |
+|![Resulting Playlist](playlist.PNG)|
 
 
 NOTES:
