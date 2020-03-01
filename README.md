@@ -3,8 +3,10 @@ My concept for an improved Spotify recommendation system, using a connected grap
 
 To run this, you need to firstly fill out the config file provided, and also create an empty folder named "data" in the directory (this is where the database file will go).
 
-HOW IT WORKS:
+Eventually this is going to go on a web app, once I figure out how the heck Flask works, but in the meantime you can play with it using CLI.py, which provides a crude command-line interface.
 
+HOW IT WORKS:
+------------
 Everyone knows that the spotify recommendation system is underwhelming. The two key problems I identified with it were:
   1: It looks at your play history, and so only recommends music that is basically the same as what you already listen to
   2: It mostly recommends mainstream, popular bands you have probably already heard of
@@ -19,10 +21,12 @@ The issue is that there is no way to do this in the native API, so I made some f
 This database will have a total size of 320MB when filled out with all 1.2 million artists, which seems perfectly acceptable. Currently I only bothered to run it for the first 500,000 artists, just to make sure it was all working fine.
 
 SAMPLE IMAGES:
-
+---------
 
 NOTES:
-
+------
 Filling the database takes a while, mostly limited by Spotify's in-house API rate limiting which is unavoidable. Currently, to scrape all 1.2 million artists should take approximately 5 days of constant runtime. However, the database "grows" somewhat naturally around a starting kernel, so the database should be perfectly usable for the vast majority of users even with only ~10% of the complete dataset. Use the "Deep Dive" method included in the GUI if you want to grow the database around a specific niche or microgenre.
 
 Artists who are so obscure that the spotify recommendation system doesnt work for them are ignored (in my experience generally those with less than 1000 total streams)
+
+I have some ideas for other recommendation algorithms I am still working on, as well as the possibility of creating similar databases with rateyourmusic.com to catalogue artist popularity/ratings, etc etc.
