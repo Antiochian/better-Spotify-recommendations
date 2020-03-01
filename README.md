@@ -1,5 +1,5 @@
 # better-recommendations
-My concept for an improved Spotify recommendation system, using a connected graph of 1.2 million Spotify artists stored in an SQL database
+My concept for an improved Spotify recommendation system, using a connected graph of 1.2 million Spotify artists stored in an SQL database. You can search for an artist, and it will give you some other artists you might like, with an option to automatically create a playlist as well.
 
 To run this, you need to firstly fill out the config file provided, and also create an empty folder named "data" in the directory (this is where the database file will go).
 
@@ -23,6 +23,11 @@ This database will have a total size of 320MB when filled out with all 1.2 milli
 SAMPLE IMAGES:
 ---------
 
+| ![Menu screen](splash.PNG) | 
+|:--:| 
+| *Splash Screen* |
+![Search results](results.PNG)
+![Resulting Playlist](playlist.PNG)
 NOTES:
 ------
 Filling the database takes a while (5 days), mostly limited by Spotify's in-house API rate limiting which is unavoidable. Currently, to scrape all 1.2 million artists should take approximately 5 days of constant runtime. However, the database "grows" somewhat naturally around a starting kernel, so the database should be perfectly usable for the vast majority of users even with only ~10% of the complete dataset. Use the "Deep Dive" method included in the GUI if you want to grow the database around a specific niche or microgenre.
