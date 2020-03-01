@@ -25,7 +25,7 @@ SAMPLE IMAGES:
 
 NOTES:
 ------
-Filling the database takes a while, mostly limited by Spotify's in-house API rate limiting which is unavoidable. Currently, to scrape all 1.2 million artists should take approximately 5 days of constant runtime. However, the database "grows" somewhat naturally around a starting kernel, so the database should be perfectly usable for the vast majority of users even with only ~10% of the complete dataset. Use the "Deep Dive" method included in the GUI if you want to grow the database around a specific niche or microgenre.
+Filling the database takes a while (5 days), mostly limited by Spotify's in-house API rate limiting which is unavoidable. Currently, to scrape all 1.2 million artists should take approximately 5 days of constant runtime. However, the database "grows" somewhat naturally around a starting kernel, so the database should be perfectly usable for the vast majority of users even with only ~10% of the complete dataset. Use the "Deep Dive" method included in the GUI if you want to grow the database around a specific niche or microgenre.
 
 Artists who are so obscure that the spotify recommendation system doesnt work for them are ignored (in my experience generally those with less than 1000 total streams)
 
