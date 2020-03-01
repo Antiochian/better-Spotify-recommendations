@@ -1,5 +1,5 @@
 # better-recommendations
-My concept for an improved Spotify recommendation system, using a connected graph of spotify artists stored in an SQL database
+My concept for an improved Spotify recommendation system, using a connected graph of 1.2 million Spotify artists stored in an SQL database
 
 To run this, you need to firstly fill out the config file provided, and also create an empty folder named "data" in the directory (this is where the database file will go).
 
