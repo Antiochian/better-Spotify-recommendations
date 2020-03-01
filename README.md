@@ -23,7 +23,8 @@ This database will have a total size of 320MB when filled out with all 1.2 milli
 SAMPLE IMAGES:
 ---------
 
-| ![Menu screen](splash.PNG) | 
+|:--:| 
+|![Menu screen](splash.PNG) | 
 | *Splash Screen* |
 |:--:| 
 |![Search results](results.PNG)|
