@@ -7,7 +7,7 @@ Eventually this is going to go on a web app, once I figure out how the heck Flas
 
 HOW IT WORKS:
 ------------
-Everyone knows that the spotify recommendation system is underwhelming. The two key problems I identified with it were:
+Everyone knows that the Spotify recommendation system is underwhelming. The two key problems I identified with it were:
   - It looks at your play history, and so only recommends music that is basically the same as what you already listen to
   - It mostly recommends mainstream, popular bands you have probably already heard of
 
@@ -23,12 +23,12 @@ This database will have a total size of 320MB when filled out with all 1.2 milli
 SAMPLE IMAGES:
 ---------
 
-| *Splash Screen* |
+|SAMPLE IMAGES|
+|:---:|
+|*Splash Screen*|
 |![Menu screen](splash.PNG)|
-|:--:| 
 | *Example results for the noise-rock band "Swans"*|
 |![Search results](results.PNG)|
-|:--:| 
 | *Example resulting playlist for Swans* |
 |![Resulting Playlist](playlist.PNG)|
 
