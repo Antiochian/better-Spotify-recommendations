@@ -3,9 +3,10 @@
 Created on Sat Feb 29 03:00:39 2020
 
 @author: Antiochian
-goal is to build a database of reccomendations for EVERY track on spotify (is that possible?????)
 
-lets try artists instead, ey?
+User interface for this file is provided in "CLI.py", although there are some hidden
+debug functions in here that cannot be accessed from the former, which are at the bottom
+of this file.
 
 TIMINGS FOR DIFFERENT DISCOVERY METHODS:
 Recursive tree:
@@ -41,17 +42,20 @@ FILENAME=r"data/artistdb.db"
 global DEBUGCOUNTER
 DEBUGCOUNTER = 0
 
-#test seeds for debugging
-PUPseed = '4b2sN5dz0hX8hOZwC3Fckr' #PUP
-SWANSseed = '79S80ZWgVhIPMCHuvl6SkA' #Swans
-BHseed = '56ZTgzPBDge0OvCGgMO3OY' #beach house
-FLseed = '16eRpMNXSQ15wuJoeqguaB' #flaming lips
-slickseed = '1W9qOBYRTfP7HcizWN43G1' #slick rick
-parquetseed = '23NIwARd4vPbxt3wwNnJ6k' #parquet courts
+#test artist ID values for debugging
+#PUPseed = '4b2sN5dz0hX8hOZwC3Fckr' #PUP
+#SWANSseed = '79S80ZWgVhIPMCHuvl6SkA' #Swans
+#BHseed = '56ZTgzPBDge0OvCGgMO3OY' #beach house
+#FLseed = '16eRpMNXSQ15wuJoeqguaB' #flaming lips
+#slickseed = '1W9qOBYRTfP7HcizWN43G1' #slick rick
+#parquetseed = '23NIwARd4vPbxt3wwNnJ6k' #parquet courts
 
 ############## SQLITE UTILITIES ###################
 
 def make_database():
+    """Make database + table if it doesnt already exist. Does nothing
+    if the database already exists, so its harmless (albeit a little 
+    unprofessional) to overcall this function"""
     global NUM_OF_RECCS, ID_LENGTH, FILENAME
     execution_string = '''CREATE TABLE IF NOT EXISTS Artists (
                         id varchar('''+str(ID_LENGTH)+''')'''
@@ -66,6 +70,7 @@ def make_database():
     return
 
 def insert_rows(db,cursor,list_of_rows):
+    """Insert multiple rows at once into SQL table"""
     global NUM_OF_RECCS
     cursor = db.cursor()
     for row in list_of_rows:
@@ -74,13 +79,15 @@ def insert_rows(db,cursor,list_of_rows):
             execution_string= '''INSERT INTO Artists
                                 VALUES ('''+valstring+''');'''
             cursor.execute(execution_string,tuple(row))
+##DEBUG ONLY:
 #            #print("\t ",row[0])
 #        else:
-#           #print("duplicate spotted at SQL: ",row[0]," skipping...")
+#           #print("duplicate spotted at SQL: ",row[0]," skipping...") 
     db.commit()
     return
 
 def get_row(target_id):
+    """Return row from header ID"""
     db = sqlite3.connect(r"data/artistdb.db")
     cursor=db.cursor()
     execution_string = "SELECT * FROM Artists WHERE id='"+target_id+"'"
@@ -89,11 +96,13 @@ def get_row(target_id):
     return row
 
 def exists_in_db(cursor, ID):
+    """Boolean to check if item exists in "id" column"""
     cond_string = '''SELECT EXISTS(SELECT 1 FROM Artists WHERE id = '''+"'"+str(ID)+"')"
     cursor.execute(cond_string)
     return cursor.fetchone()[0]
 
 def cross_columnar_search(target,db=None,cursor=None):
+    """Search to see where the target ID features in at least one column that ISNT the "id" one """
     if db==None:
         db = sqlite3.connect(r"data/artistdb.db")
         cursor=db.cursor()
@@ -109,6 +118,7 @@ def cross_columnar_search(target,db=None,cursor=None):
 ############### SPOTIFY API UTILITIES #################
 
 def setup():
+    """Set up API connection to spotify using the config file supplied"""
     CLIENT_ID, CLIENT_SECRET,REDIRECT, USER_NAME = secret_config.get_spotify_info()
     scope = 'user-library-read playlist-modify-private'
     token = util.prompt_for_user_token(USER_NAME, scope,CLIENT_ID,CLIENT_SECRET,REDIRECT)
@@ -116,59 +126,42 @@ def setup():
     return spotify
 
 def recc_from_ID(spotify, target_artist,LIMIT=20):
+    """Get spotifys reccs from a target artist ID"""
     spotify = setup()
     recc_dict = spotify.artist_related_artists(target_artist)
     return {el['id'] for el in recc_dict['artists'][:LIMIT]} # AS A SET
-#
-#def CL_search(spotify, search_term):
-#    results = spotify.search(q=search_term, type='artist',limit=10) #"album"+
-#    index = 1
-#    opt_dict = {}
-#    for item in results['artists']['items']:
-#        name = item['name']
-#        all_genres = item['genres']
-#        if len(all_genres):
-#            genre = all_genres[0]
-#        else:
-#            genre = "unknown"
-#        track_id = item['id']
-#        opt_dict[index] = track_id
-#        print("\t",index,": ",name," - ",genre )
-#        index +=1
-#    choice = input("Enter choice (Q to cancel): ")
-#    if choice.lower() != "q":
-#        return opt_dict[int(choice)] #ID value of choice
-#    else:
-#        return 0
-    
-############# RECURSIVE FUNCTIONCALL #################
-    
-def breadthwise_scraper(spotify,db,cursor, curr_ID, completed, depth, depth_limit):
-    """ total count = depth * num of reccs"""
-    global DEBUGCOUNTER
-    #commit every 100 lines
-    if depth > depth_limit:
-        return completed
-    new_row = get_row(curr_ID)
-    if new_row == None:
-        new_row = [[curr_ID] + list(recc_from_ID(spotify, curr_ID, NUM_OF_RECCS))]
+ 
+
+def CL_search(spotify, search_term):
+    """Quick method to find an artist's ID using the inbuilt spotify search feature"""
+    results = spotify.search(q=search_term, type='artist',limit=10) #"album"+
+    index = 1
+    opt_dict = {}
+    for item in results['artists']['items']:
+        name = item['name']
+        all_genres = item['genres']
+        if len(all_genres):
+            genre = all_genres[0]
+        else:
+            genre = "unknown"
+        track_id = item['id']
+        opt_dict[index] = track_id
+        print("\t",index,": ",name," - ",genre )
+        index +=1
+    choice = input("Enter choice (Q to cancel): ")
+    if choice.lower() != "q":
+        return opt_dict[int(choice)] #ID value of choice
     else:
-        new_row = [list(new_row)]
-    if curr_ID not in completed and len(new_row[0]) == NUM_OF_RECCS+1:
-        insert_rows(db,cursor,new_row)
-        DEBUGCOUNTER +=1
-    completed.update(set([curr_ID]))
-    depth += 1
-    if depth == 1:
-        for ID in new_row[0][1:]:
-            breadthwise_scraper(spotify,db,cursor, ID, completed, depth, depth_limit)
-            print("#",end='')
-    else:
-        for ID in new_row[0][1:]:
-            breadthwise_scraper(spotify,db,cursor, ID, completed, depth, depth_limit)
-    return completed
-        
+        return 0 
+    
+    
+############# DATABASE SCRAPERS #################
+
+       
 def breadthwise_launcher(start_ID,batches=1,maxdepth=1):   
+    """This launches a recursive function (below) that spreads tree-like from a 
+    source. Is slow, but has the advantage that it adds very similar artists,
+    effective for targeting growth towards a specific niche or genre"""
     spotify = setup()
     db = sqlite3.connect(FILENAME)
     cursor = db.cursor() 
@@ -190,7 +183,36 @@ def breadthwise_launcher(start_ID,batches=1,maxdepth=1):
     print("\n",DEBUGCOUNTER," new entries")
     return
 
+def breadthwise_scraper(spotify,db,cursor, curr_ID, completed, depth, depth_limit):
+    """ total count = depth * num of reccs """
+    global DEBUGCOUNTER #debug: keep track of how many tracks are being added/how fast
+    if depth > depth_limit:
+        return completed
+    new_row = get_row(curr_ID)
+    if new_row == None:
+        new_row = [[curr_ID] + list(recc_from_ID(spotify, curr_ID, NUM_OF_RECCS))]
+    else:
+        new_row = [list(new_row)]
+    if curr_ID not in completed and len(new_row[0]) == NUM_OF_RECCS+1:
+        insert_rows(db,cursor,new_row)
+        DEBUGCOUNTER +=1
+    completed.update(set([curr_ID]))
+    depth += 1
+    if depth == 1:
+        for ID in new_row[0][1:]:
+            breadthwise_scraper(spotify,db,cursor, ID, completed, depth, depth_limit)
+            print("#",end='')
+    else:
+        for ID in new_row[0][1:]:
+            breadthwise_scraper(spotify,db,cursor, ID, completed, depth, depth_limit)
+    return completed
+
 def stochastic_launcher(max_count,incompletes=set([])):
+    """This method instead scans the database for any 'loose ends', IDs that point nowhere,
+    and fills them out. This is much faster than above, but is a lot more "scattershot" and
+    undirected.
+    It is fast enough to be limited by the spotify rate limiter so any
+    further optimisation, while possible, would be pointless."""
     spotify = setup()
     db = sqlite3.connect(r"data/artistdb.db")
     cursor=db.cursor()
@@ -237,6 +259,73 @@ def stochastic_scraper(spotify,db,cursor,curr_ID,master_completed=set([])):
     else:
         insert_rows(db,cursor,[new_row])
     return set(new_row) #still add to completed though, dont want to repeat the waste of time
+
+############ DATABASE GROWTH FUNCTIONS ###############
+    
+def targeted_scraper(width=5,depth=2,targetseed=None):
+    """This scraper is much slower, and more wasteful on the API, but is
+    extremely targetted towards a specific artist, and never strays too far away from it.
+    Best used in small doses.
+    """
+    spotify=setup()
+    if targetseed==None:
+        targetseed=CL_search(spotify,input("Artist Search: "))
+    print("Running ",width,"x",depth," search...")
+    print("[Estimated runtime = ",round((NUM_OF_RECCS**depth)*width*0.025/60,3)," minutes]") #84 is experimentally determined
+    t0 = time.time()
+    breadthwise_launcher(targetseed,width,depth)
+    estimate_database_size()
+    print("\tCompleted in: ",round((time.time()-t0)/60,3)," min")
+    return
+
+def idle_scraper():
+    """This scraper is fast, minimizes Spotify API calls, and can be run indefinitely
+    However it only produces very loosely-grouped results, and can stray off into
+    incredibly niche artists if left unchecked. To mitigate this it resets after 1250
+    additions, but its still a concern"""
+    batch_num = 0
+    incompletes = set([])
+    while True:
+        batch_num += 1
+        t0 = time.time()
+        print("\nBATCH #",batch_num,":")
+        incompletes = stochastic_launcher(1250,incompletes)  
+        print("\tCompleted in: ",round((time.time()-t0)/60,3)," min")
+        print(int(len(incompletes))," incompletes found")
+        estimate_database_size()
+
+def default_reccs(spotify,target,limit=False):
+    global NUM_OF_RECCS
+    """Get spotifys default recommendations (for comparison)"""
+    row = get_row(target)
+    if row == None:
+        #manually search if not in database already
+        print("Not found in database. Pinging Spotify...")
+        row =list(recc_from_ID(spotify, target,NUM_OF_RECCS))
+        db = sqlite3.connect(r"data/artistdb.db")
+        cursor = db.cursor()
+        insert_rows(db,cursor,[ [target] + row]) #surreptitiously add into db for next time
+        print("Database Updated")
+        db.close()
+    matches = row[1:]
+    if limit:
+        matches = matches[:limit]
+    return matches
+
+def reverse_reccs(spotify,target,limit=False):
+    """ My own reversed-recommendation system"""
+    matches = cross_columnar_search(target)
+    if limit:
+        matches = matches[:limit]
+    return matches
+
+def artists_to_tracks(spotify,artist_list):
+    track_list = []
+    for artist in artist_list:
+        top_tracks = spotify.artist_top_tracks(artist)['tracks']
+        shuffle(top_tracks) #randomize
+        track_list.append(top_tracks[0])
+    return track_list
 
 ############# DATABASE DEBUG/ACCESS TOOLS ####################
 def estimate_database_size():
@@ -313,119 +402,6 @@ def dump_from_regex(search_term):
     print("\t",matches," found in ",round(time.time()-t0,4)," seconds")
     return
 
-
-################ RECOMMENDATION ALGORITHMS ####################
-    
-#def reverse_recc_CLI():
-#    """CLI for my reverse reccs, mostly for debug"""
-#    spotify = setup()
-#    search_term = input("Artist Search: ")
-#    target = CL_search(spotify,search_term)
-#    if target:
-#        results = reverse_recc(spotify,target)
-#    matches = ID_list_to_string(spotify,matches,limit)
-#    if matches == []:
-#        print("Not found.")
-#    else:
-#        print(*matches,sep="\n")
-#    return
-                
-
-#def def_recc(spotify,target):
-#    global NUM_OF_RECCS
-#    """Get spotifys default recommendations (for comparison)"""
-#    row = get_row(target)
-#    if row == None:
-#        #manually search if not in database already
-#        print("Not found in database. Pinging Spotify...")
-#        row =list(recc_from_ID(spotify, target,NUM_OF_RECCS))
-#        db = sqlite3.connect(r"data/artistdb.db")
-#        cursor = db.cursor()
-#        insert_rows(db,cursor,[ [target] + row]) #surreptitiously add into db for next time
-#        print("Database Updated")
-#        db.close()
-#    string_list = ID_list_to_string(spotify,row[1:])
-#    print(*string_list, sep="\n")
-#    return
-
-#def both_reccs_CLI():
-#    spotify = setup()
-#    startseed = CL_search(spotify,input("Artist Search: "))
-#    print("\nDefault Reccs:")
-#    print("-"*10)
-#    def_recc(spotify,startseed)   
-#    print("\nReverse Reccs:")
-#    print("-"*10)
-#    reverse_recc(spotify,startseed,10)
-
-
-############ DATABASE GROWTH FUNCTIONS ###############
-    
-def targeted_scraper(width=5,depth=2,targetseed=None):
-    """This scraper is much slower, and more wasteful on the API, but is
-    extremely targetted towards a specific artist, and never strays too far away from it.
-    Best used in small doses.
-    """
-    spotify=setup()
-    if targetseed==None:
-        targetseed=CL_search(spotify,input("Artist Search: "))
-    print("Running ",width,"x",depth," search...")
-    print("[Estimated runtime = ",round((NUM_OF_RECCS**depth)*width*0.025/60,3)," minutes]") #84 is experimentally determined
-    t0 = time.time()
-    breadthwise_launcher(targetseed,width,depth)
-    estimate_database_size()
-    print("\tCompleted in: ",round((time.time()-t0)/60,3)," min")
-    return
-
-def idle_scraper():
-    """This scraper is fast, minimizes Spotify API calls, and can be run indefinitely
-    However it only produces very loosely-grouped results, and can stray off into
-    incredibly niche artists if left unchecked. To mitigate this it resets after 1250
-    additions, but its still a concern"""
-    batch_num = 0
-    incompletes = set([])
-    while True:
-        batch_num += 1
-        t0 = time.time()
-        print("\nBATCH #",batch_num,":")
-        incompletes = stochastic_launcher(1250,incompletes)  
-        print("\tCompleted in: ",round((time.time()-t0)/60,3)," min")
-        print(int(len(incompletes))," incompletes found")
-        estimate_database_size()
-
-def default_reccs(spotify,target,limit=False):
-    global NUM_OF_RECCS
-    """Get spotifys default recommendations (for comparison)"""
-    row = get_row(target)
-    if row == None:
-        #manually search if not in database already
-        print("Not found in database. Pinging Spotify...")
-        row =list(recc_from_ID(spotify, target,NUM_OF_RECCS))
-        db = sqlite3.connect(r"data/artistdb.db")
-        cursor = db.cursor()
-        insert_rows(db,cursor,[ [target] + row]) #surreptitiously add into db for next time
-        print("Database Updated")
-        db.close()
-    matches = row[1:]
-    if limit:
-        matches = matches[:limit]
-    return matches
-
-def reverse_reccs(spotify,target,limit=False):
-    """ My own reversed-recommendation system"""
-    matches = cross_columnar_search(target)
-    if limit:
-        matches = matches[:limit]
-    return matches
-
-def artists_to_tracks(spotify,artist_list):
-    track_list = []
-    for artist in artist_list:
-        top_tracks = spotify.artist_top_tracks(artist)['tracks']
-        shuffle(top_tracks) #randomize
-        track_list.append(top_tracks[0])
-    return track_list
-
 def count_loose_ends():
     global FILENAME
     db = sqlite3.connect(FILENAME)
@@ -440,50 +416,3 @@ def count_loose_ends():
     print(len(loose_ends),"/",len(pointing_IDs)," Loose ends remain")
     db.close()
     return
-
-
-def CL_search(spotify, search_term):
-    results = spotify.search(q=search_term, type='artist',limit=10) #"album"+
-    index = 1
-    opt_dict = {}
-    for item in results['artists']['items']:
-        name = item['name']
-        all_genres = item['genres']
-        if len(all_genres):
-            genre = all_genres[0]
-        else:
-            genre = "unknown"
-        track_id = item['id']
-        opt_dict[index] = track_id
-        print("\t",index,": ",name," - ",genre )
-        index +=1
-    choice = input("Enter choice (Q to cancel): ")
-    if choice.lower() != "q":
-        return opt_dict[int(choice)] #ID value of choice
-    else:
-        return 0
-#if __name__ == "__main__":
-#    print("\n Reverse Recommender Protoype - Welcome!\n")
-#    choice = int(input("1: Grow/make database\n2: Get recommendations\n\t> "))
-#    if choice == 1:
-#        make_database()
-#        choice = int(input("\t1: Stochastic Growth (faster)\n\t2: Targeted Growth\n\t3: Deep-Dive (very slow!)\n\t> "))
-#        if choice == 1:
-#            idle_scraper()
-#        elif choice == 2:
-#            targeted_scraper(10,3)
-#        elif choice == 3:
-#            targeted_scraper(10,4)
-#    elif choice == 2:
-#        both_reccs_CLI()
-#    else:
-#        print("Invalid response.")
-#    print("Quitting...")
-
-
-#stochastic_launcher(388)
-#RATseed = '2PmIyxmEFsNfQJjEifPDZC' #RATBOY
-##def_recc(setup(),RATseed)
-##both_reccs_CLI()       
-##stochastic_launcher(10)
-#targeted_scraper(10,3,RATseed)
