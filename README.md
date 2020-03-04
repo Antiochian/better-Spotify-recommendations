@@ -18,7 +18,7 @@ Generally speaking, recommendations flow uphill, which is to say that less mains
 
 The issue is that there is no way to do this in the native API, so I made some functions to create and then fill out an SQL database of every artist on spotify and the first 10 default Spotify recommmended artists they point to.
 
-This database will have a total size of 320MB when filled out with all 1.2 million artists, which seems perfectly acceptable. Currently I only bothered to run it for the first 500,000 artists, just to make sure it was all working fine.
+This database will have a total size of 320MB when filled out with all 1.2 million artists, which seems perfectly acceptable. Currently I only bothered to run it for the first 100,000 artists, just to make sure it was all working fine.
 
 SAMPLE IMAGES:
 ---------
