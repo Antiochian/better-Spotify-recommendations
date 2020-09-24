@@ -1,5 +1,5 @@
 # better-recommendations
-My concept for an improved Spotify recommendation system, using a connected graph of 1.2 million Spotify artists stored in an SQL database. You can search for an artist, and it will give you some other artists you might like, with an option to automatically create a playlist as well.
+My concept for an improved/alternative Spotify recommendation system, using a connected graph of 1.2 million Spotify artists stored in an SQL database. You can search for an artist, and it will give you some other artists you might like, with an option to automatically create a playlist as well.
 
 To run this, you need to firstly fill out the config file provided, and also create an empty folder named "data" in the directory (this is where the database file will go).
 
@@ -7,8 +7,8 @@ Eventually this is going to go on a web app, once I figure out how the heck Flas
 
 HOW IT WORKS:
 ------------
-Everyone knows that the Spotify recommendation system is underwhelming. The two key problems I identified with it were:
-  - It looks at your play history, and so only recommends music that is basically the same as what you already listen to
+The Spotify recommendation system is extremely good, but, for my preferences, not perfect. The two key problems I identified with it were:
+  - It looks at your play history, and so often only recommends music that is basically the same as what you already listen to
   - It mostly recommends mainstream, popular bands you have probably already heard of
 
 I wanted to make an algorithm to recommend new music to me that would pull me outside of a comfort zone a little, and provide more interesting reccs, using only the Spotify API. The first issue is easily solved by deliberately using a "dumb" algorithm that knows nothing about the user, to avoid inadvertently pigeonholing them and introduce more variety.
@@ -18,7 +18,7 @@ Generally speaking, recommendations flow uphill, which is to say that less mains
 
 The issue is that there is no way to do this in the native API, so I made some functions to create and then fill out an SQL database of every artist on spotify and the first 10 default Spotify recommmended artists they point to.
 
-This database will have a total size of 320MB when filled out with all 1.2 million artists, which seems perfectly acceptable. Currently I only bothered to run it for the first 100,000 artists, just to make sure it was all working fine.
+This database has a total size of 320MB when filled out with all 1.2 million artists, which seems perfectly acceptable. Currently I only bothered to run it for the first 100,000 artists, just to make sure it was all working fine.
 
 SAMPLE IMAGES:
 ---------
